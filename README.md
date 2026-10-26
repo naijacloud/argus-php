@@ -305,6 +305,10 @@ These are planned, and not done yet:
 - an `argus` CLI command in this package (use
   [`argus-cli`](https://github.com/naijacloud/argus-cli) `test`).
 
+On some PHP 8.1 builds, PHP doesn't run shutdown functions after an
+out-of-memory fatal error, so that one kind of crash isn't reported there.
+PHP 8.2 and later, and the official PHP 8.1 Docker image, report it.
+
 ## License
 
 MIT
