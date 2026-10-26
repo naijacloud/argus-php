@@ -74,7 +74,8 @@ jobs:
           ini-values: error_reporting=E_ALL, display_errors=On
           tools: composer
       - name: Confirm curl is gone
-        run: php -r 'exit(function_exists("curl_init") ? 1 : 0);'
+        run: |
+          php -r 'exit(function_exists("curl_init") ? 1 : 0);'
       - run: composer install --no-interaction --no-progress --prefer-dist
       - run: vendor/bin/phpunit --colors=always
 
