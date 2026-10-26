@@ -75,8 +75,8 @@ final class HandlersTest extends ServerTestCase
 
     public function testAFatalErrorIsReportedFromShutdown(): void
     {
-        [$code, , $err] = $this->runScript('fatal.php');
-        self::assertSame(255, $code);
+        [$code, $out, $err] = $this->runScript('fatal.php');
+        self::assertSame(255, $code, "stdout:\n{$out}\nstderr:\n{$err}");
         self::assertStringContainsString('Allowed memory size', $err);
         $reqs = self::$server->requests('/api/');
         self::assertCount(1, $reqs);
