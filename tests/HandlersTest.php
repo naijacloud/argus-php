@@ -76,7 +76,7 @@ final class HandlersTest extends ServerTestCase
     public function testAFatalErrorIsReportedFromShutdown(): void
     {
         // The exit code after an out-of-memory fatal varies by PHP build (255
-        // on most, 1 on some 8.1 builds), so compare with the same script run
+        // on most, 1 on some builds), so compare with the same script run
         // without Argus: the SDK must not change it.
         [$bare] = $this->runScript('fatal.php', ['ARGUS_DSN' => '']);
         self::$server->reset();
@@ -85,12 +85,6 @@ final class HandlersTest extends ServerTestCase
         self::assertSame($bare, $code, "stdout:\n{$out}\nstderr:\n{$err}");
         self::assertStringContainsString('Allowed memory size', $err);
         $reqs = self::$server->requests('/api/');
-        if (PHP_VERSION_ID < 80200 && count($reqs) === 0) {
-            // Some PHP 8.1 builds (setup-php's, not the official Docker image)
-            // never run shutdown functions after an out-of-memory fatal. The
-            // README says so; 8.1 has been out of support since 2025-12.
-            self::markTestSkipped('this PHP 8.1 build skips shutdown functions after an out-of-memory fatal');
-        }
         self::assertCount(1, $reqs);
         $e = self::envelope($reqs[0])[2];
         self::assertSame('fatal', $e['level']);

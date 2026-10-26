@@ -21,7 +21,7 @@ vendor/bin/phpunit
 vendor/bin/phpstan analyse
 ```
 
-PHP 8.1 or newer. The runtime needs `ext-json` and nothing else, and it should
+A patched PHP (8.2.35, 8.3.36, 8.4.27, 8.5.12 or newer; see the README). The runtime needs `ext-json` and nothing else, and it should
 stay that way: every runtime dependency is one more thing an app's own
 constraints have to agree with. `psr/log` and `monolog/monolog` are dev
 dependencies so their adapters are tested and analysed, and only suggested to
@@ -78,7 +78,7 @@ vendor/bin/phpstan analyse --no-progress
 vendor/bin/phpunit
 ```
 
-CI also runs the suite on PHP 8.1 to 8.4, without `ext-curl`, and with the
+CI also runs the suite on PHP 8.2 to 8.5, without `ext-curl`, and with the
 lowest dependency versions the ranges allow.
 
 ## Releasing

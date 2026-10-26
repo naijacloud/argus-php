@@ -8,6 +8,10 @@ All notable changes to `naijacloud/argus` are listed here. The format follows
 
 ## [0.1.0] - 2026-10-26
 
+- **Requires a patched PHP:** 8.2.35, 8.3.36, 8.4.27, 8.5.12 or newer, the
+  releases that fix php2shell (CVE-2026-109618 and CVE-2026-109619).
+  Composer refuses older releases. PHP 8.1 is end of life and unsupported.
+
 First release, implementing the Argus SDK contract `argus.sdk/1`.
 
 ### Added

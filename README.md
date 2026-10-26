@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://packagist.org/packages/naijacloud/argus"><img alt="packagist" src="https://img.shields.io/badge/packagist-naijacloud%2Fargus-008751?style=flat-square&labelColor=0A0E0C"></a>
-  <img alt="php" src="https://img.shields.io/badge/php-%3E%3D_8.1-8892BF?style=flat-square&labelColor=0A0E0C">
+  <img alt="php" src="https://img.shields.io/badge/php-%3E%3D_8.2.35-8892BF?style=flat-square&labelColor=0A0E0C">
   <img alt="dependencies" src="https://img.shields.io/badge/dependencies-ext--json_only-46C98A?style=flat-square&labelColor=0A0E0C">
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-8A988F?style=flat-square&labelColor=0A0E0C"></a>
 </p>
@@ -47,8 +47,12 @@ check-ins and flags through the same setup.
 composer require naijacloud/argus
 ```
 
-PHP 8.1 or newer. `ext-curl` is used when it is loaded; without it the SDK
-sends through PHP's own `https://` stream wrapper.
+PHP 8.2.35, 8.3.36, 8.4.27, 8.5.12 or newer: the releases with the fix for
+php2shell (CVE-2026-109618 and CVE-2026-109619), a remote-code-execution bug
+in every PHP that serves web requests. Composer refuses older releases on
+purpose. PHP 8.1 is past end of life and got no fix, so it isn't supported.
+
+`ext-curl` is used when it is loaded; without it the SDK sends through PHP's own `https://` stream wrapper.
 
 Copy the DSN (your app's key) from the source in Argus. It looks like
 `https://<key>@argus-in.naijacloud.com/<number>`. Then, as early as possible in
@@ -304,10 +308,6 @@ These are planned, and not done yet:
   `public/index.php`);
 - an `argus` CLI command in this package (use
   [`argus-cli`](https://github.com/naijacloud/argus-cli) `test`).
-
-On some PHP 8.1 builds, PHP doesn't run shutdown functions after an
-out-of-memory fatal error, so that one kind of crash isn't reported there.
-PHP 8.2 and later, and the official PHP 8.1 Docker image, report it.
 
 ## License
 

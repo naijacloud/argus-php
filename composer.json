@@ -17,7 +17,7 @@
         "issues": "https://github.com/naijacloud/argus-php/issues"
     },
     "require": {
-        "php": ">=8.1",
+        "php": "~8.2.35 || ~8.3.36 || ~8.4.27 || ~8.5.12 || >=8.6",
         "ext-json": "*"
     },
     "require-dev": {
