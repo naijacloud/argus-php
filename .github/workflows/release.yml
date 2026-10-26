@@ -1,0 +1,95 @@
+name: Release
+
+# Packagist has no upload: it reads tags from GitHub. Once the package is
+# submitted on packagist.org and the GitHub hook is installed, pushing a tag is
+# the release. This workflow checks the tag is one worth having (CI passes,
+# composer.json and Client::VERSION both match it, the changelog has its
+# section) and creates the GitHub release.
+#
+# The check matters more here than anywhere: composer.json carries a `version`
+# field, and Packagist silently skips a tag whose name disagrees with it.
+
+on:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      # `gh release create`.
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag against the package
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          composer_version="$(php -r 'echo json_decode(file_get_contents("composer.json"), true)["version"] ?? "";')"
+          const_version="$(sed -n "s/^ *public const VERSION = '\(.*\)';$/\1/p" src/Client.php)"
+          ok=true
+          if [ "$TAG" != "v$composer_version" ]; then
+            echo "::error::Tag $TAG does not match composer.json version ($composer_version). Packagist would skip this tag."
+            ok=false
+          fi
+          if [ "$TAG" != "v$const_version" ]; then
+            echo "::error::Tag $TAG does not match Client::VERSION ($const_version). Events and the User-Agent would report the wrong version."
+            ok=false
+          fi
+          [ "$ok" = true ] || exit 1
+          case "$const_version" in
+            *-*) ;; # a pre-release (v0.3.0-RC1) needs no changelog section
+            *) grep -q "^## \[$const_version\]" CHANGELOG.md || {
+                 echo "::error::CHANGELOG.md has no '## [$const_version]' heading. Move the Unreleased entries under it."
+                 exit 1
+               } ;;
+          esac
+          echo "VERSION=$const_version" >> "$GITHUB_ENV"
+
+      - name: Create the GitHub release from the changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          awk -v v="$VERSION" '
+            index($0, "## [" v "]") == 1 { on = 1; next }
+            on && /^## / { exit }
+            on && !/^\[[^]]+\]: / { print }
+          ' CHANGELOG.md > notes.md
+          [ -s notes.md ] || echo "See CHANGELOG.md." > notes.md
+          flags=()
+          case "$VERSION" in *-*) flags+=(--prerelease) ;; esac
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md "${flags[@]}"
+
+      # The GitHub hook normally tells Packagist about the tag. This is the
+      # fallback for when it is not installed: with PACKAGIST_USERNAME and
+      # PACKAGIST_TOKEN (the API token shown on packagist.org/profile) set,
+      # the run asks Packagist to re-read the repository itself. Without them it
+      # is skipped and the hook is relied on.
+      - name: Tell Packagist about the tag
+        env:
+          PACKAGIST_USERNAME: ${{ secrets.PACKAGIST_USERNAME }}
+          PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
+        run: |
+          if [ -z "$PACKAGIST_USERNAME" ] || [ -z "$PACKAGIST_TOKEN" ]; then
+            echo "No Packagist API token set; relying on the GitHub hook to pick up the tag."
+            exit 0
+          fi
+          # The endpoint and body are the ones packagist.org/about documents.
+          curl -fsS -X POST \
+            -H 'Content-Type: application/json' \
+            "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_TOKEN}" \
+            -d '{"repository":{"url":"https://packagist.org/packages/naijacloud/argus"}}'

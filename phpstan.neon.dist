@@ -1,0 +1,7 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    # Monolog and psr/log are optional at runtime but installed for analysis,
+    # so the adapters are checked against the real interfaces.
+    treatPhpDocTypesAsCertain: false

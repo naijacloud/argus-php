@@ -1,0 +1,58 @@
+{
+    "name": "naijacloud/argus",
+    "description": "Official PHP SDK for Naijacloud Argus: errors, logs, metrics, traces, cron check-ins and feature flags. Framework-free.",
+    "type": "library",
+    "keywords": ["naijacloud", "argus", "error-tracking", "monitoring", "logging", "tracing", "opentelemetry", "sentry", "apm"],
+    "homepage": "https://www.naijacloud.com/argus",
+    "license": "MIT",
+    "version": "0.1.0",
+    "authors": [
+        {
+            "name": "Naija Cloud",
+            "homepage": "https://www.naijacloud.com"
+        }
+    ],
+    "support": {
+        "email": "support@naijacloud.com",
+        "issues": "https://github.com/naijacloud/argus-php/issues"
+    },
+    "require": {
+        "php": ">=8.1",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "monolog/monolog": "^3.0",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^10.5",
+        "psr/log": "^3.0"
+    },
+    "suggest": {
+        "ext-curl": "Faster sending with connection reuse; without it the SDK uses PHP's https:// stream wrapper",
+        "ext-zlib": "Gzips error envelopes before sending",
+        "psr/log": "For NaijaCloud\\Argus\\Log\\PsrLogger, a PSR-3 logger that writes to Argus Logs",
+        "monolog/monolog": "For NaijaCloud\\Argus\\Log\\MonologHandler (Monolog 2 or 3)"
+    },
+    "autoload": {
+        "psr-4": {
+            "NaijaCloud\\Argus\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NaijaCloud\\Argus\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --no-progress",
+        "test:contract": "php tests/contract/run.php"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

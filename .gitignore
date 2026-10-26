@@ -1,0 +1,13 @@
+/vendor/
+/.phpunit.cache/
+/.phpunit.result.cache
+
+# composer.lock is deliberately absent: this is a library, not an application.
+# Pinning it here would not affect a consumer (Composer resolves against the
+# consuming project's lock) and would only hide the fact that CI must exercise
+# the dependency range the package actually claims to support.
+composer.lock
+
+.DS_Store
+.idea/
+.vscode/
