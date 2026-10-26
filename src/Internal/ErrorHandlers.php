@@ -113,6 +113,35 @@ final class ErrorHandlers
         return false; // let PHP's own handler log or display it as usual
     }
 
+    /**
+     * After an out-of-memory fatal the freed reserve isn't always enough to
+     * build and send the report (it depends on the PHP build), so give the
+     * shutdown work 5 MB more, as Sentry's PHP SDK does.
+     */
+    private static function raiseMemoryLimit(): void
+    {
+        $limit = self::bytes((string) ini_get('memory_limit'));
+        if ($limit > 0) {
+            @ini_set('memory_limit', (string) ($limit + 5 * 1024 * 1024));
+        }
+    }
+
+    /** `128M` and the like as bytes; -1 (no limit) and nonsense as 0. */
+    private static function bytes(string $value): int
+    {
+        $value = trim($value);
+        if ($value === '' || $value === '-1' || !preg_match('/^(\d+)\s*([kmg]?)$/i', $value, $m)) {
+            return 0;
+        }
+        $n = (int) $m[1];
+        return match (strtolower($m[2])) {
+            'k' => $n * 1024,
+            'm' => $n * 1024 * 1024,
+            'g' => $n * 1024 * 1024 * 1024,
+            default => $n,
+        };
+    }
+
     public static function onShutdown(): void
     {
         if (self::$reserve !== null) {
@@ -124,6 +153,9 @@ final class ErrorHandlers
         }
         try {
             $err = error_get_last();
+            if ($err !== null && str_starts_with($err['message'], 'Allowed memory size')) {
+                self::raiseMemoryLimit();
+            }
             if (self::$handlersInstalled && $err !== null && ($err['type'] & self::FATAL) !== 0
                 && !(self::$uncaughtSeen && str_starts_with($err['message'], 'Uncaught '))) {
                 $client->captureException(
