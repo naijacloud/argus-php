@@ -80,12 +80,12 @@ final class HandlersTest extends ServerTestCase
         // without Argus: the SDK must not change it.
         [$bare] = $this->runScript('fatal.php', ['ARGUS_DSN' => '']);
         self::$server->reset();
-        [$code, $out, $err] = $this->runScript('fatal.php');
+        [$code, $out, $err] = $this->runScript('fatal.php', ['ARGUS_DEBUG' => '1']);
         self::assertNotSame(0, $code);
         self::assertSame($bare, $code, "stdout:\n{$out}\nstderr:\n{$err}");
         self::assertStringContainsString('Allowed memory size', $err);
         $reqs = self::$server->requests('/api/');
-        self::assertCount(1, $reqs);
+        self::assertCount(1, $reqs, "stderr:\n{$err}");
         $e = self::envelope($reqs[0])[2];
         self::assertSame('fatal', $e['level']);
         self::assertStringContainsString('Allowed memory size', $e['exception']['values'][0]['value']);
