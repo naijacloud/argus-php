@@ -205,7 +205,7 @@ $all = Argus::flags()->all((string) $user->id, ['plan' => 'pro']);
 
 - **Caching:** answers are cached for 30 seconds per user, for the life of the
   PHP process.
-- **Timeout:** a flag check waits at most `flags_timeout_ms` (1 second by
+- **Timeout:** a flag check waits at most `flags_timeout_ms` (2 seconds by
   default).
 - **Fallback:** if Argus can't be reached, or the flag doesn't exist, you get
   the fallback you passed.
@@ -274,7 +274,7 @@ Argus filters again on arrival.
 | `register_handlers` | `true` | Install the exception and error handlers |
 | `error_types` | `E_ALL` minus deprecations and notices | PHP errors sent as events |
 | `flush_timeout_ms` | `2000` | Most time spent sending at shutdown |
-| `flags_timeout_ms` | `1000` | Most time a flag check waits |
+| `flags_timeout_ms` | `2000` | Most time a flag check waits |
 | `finish_request` | `true` | Call `fastcgi_finish_request()` before sending |
 | `context_lines` | `true` | Send source lines around stack frames |
 | `project_root` | the directory holding `vendor/` | Frames under it are your code |

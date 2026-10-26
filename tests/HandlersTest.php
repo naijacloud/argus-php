@@ -75,8 +75,14 @@ final class HandlersTest extends ServerTestCase
 
     public function testAFatalErrorIsReportedFromShutdown(): void
     {
+        // The exit code after an out-of-memory fatal varies by PHP build (255
+        // on most, 1 on some 8.1 builds), so compare with the same script run
+        // without Argus: the SDK must not change it.
+        [$bare] = $this->runScript('fatal.php', ['ARGUS_DSN' => '']);
+        self::$server->reset();
         [$code, $out, $err] = $this->runScript('fatal.php');
-        self::assertSame(255, $code, "stdout:\n{$out}\nstderr:\n{$err}");
+        self::assertNotSame(0, $code);
+        self::assertSame($bare, $code, "stdout:\n{$out}\nstderr:\n{$err}");
         self::assertStringContainsString('Allowed memory size', $err);
         $reqs = self::$server->requests('/api/');
         self::assertCount(1, $reqs);

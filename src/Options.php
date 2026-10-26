@@ -75,7 +75,7 @@ final class Options
         $this->enabled = ($o['enabled'] ?? true) !== false;
         $this->httpClient = ($o['http_client'] ?? null) instanceof HttpClient ? $o['http_client'] : null;
         $this->flushTimeoutMs = is_int($o['flush_timeout_ms'] ?? null) ? max(0, $o['flush_timeout_ms']) : 2000;
-        $this->flagsTimeoutMs = is_int($o['flags_timeout_ms'] ?? null) ? max(1, $o['flags_timeout_ms']) : 1000;
+        $this->flagsTimeoutMs = is_int($o['flags_timeout_ms'] ?? null) ? max(1, $o['flags_timeout_ms']) : 2000;
         $this->registerHandlers = ($o['register_handlers'] ?? true) !== false;
         $this->registerShutdown = ($o['register_shutdown'] ?? true) !== false;
         $this->errorTypes = is_int($o['error_types'] ?? null)
