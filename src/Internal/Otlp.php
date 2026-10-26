@@ -31,7 +31,7 @@ final class Otlp
             } elseif (is_int($v)) {
                 $out[] = ['key' => $key, 'value' => ['intValue' => (string) $v]];
             } elseif (is_float($v)) {
-                $out[] = ['key' => $key, 'value' => is_finite($v) ? ['doubleValue' => $v] : ['stringValue' => (string) $v]];
+                $out[] = ['key' => $key, 'value' => is_finite($v) ? ['doubleValue' => $v] : ['stringValue' => is_nan($v) ? 'NaN' : ($v > 0 ? 'Infinity' : '-Infinity')]];
             } elseif (is_string($v)) {
                 $out[] = ['key' => $key, 'value' => ['stringValue' => $v]];
             } else {
